@@ -7,6 +7,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
@@ -21,15 +24,20 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	// First Read image
 	imageFile, header, err := r.FormFile("image")
 
-	imageName := string.Split(header.Filename, ".")
+	// Contains filename and extension
+	imageName := strings.Split(header.Filename, ".")
 	if err != nil {
 		responseError(w, "Could not read image", http.StatusBadRequest)
 		return
 	}
 	defer imageFile.Close()
+
 	var imageBuffer bytes.Buffer
 	// Copy image data to a buffer
 	io.Copy(&imageBuffer, imageFile)
+
+	// Create Request to tfServer
+	var tfServer string = "locahost:8500"
 }
 
 func responseError(w http.ResponseWriter, message string, code int) {
