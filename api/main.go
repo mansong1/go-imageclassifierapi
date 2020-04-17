@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,16 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"google.golang.org/grpc"
+
+	pb "tensorflow_serving/apis"
+	tf_core_framework "github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
 )
+
+type ClassifyResult struct {
+	FileName string `json: "Filename"`
+	Label    string `json:labels`
+}
 
 func main() {
 	fmt.Printf("Hello, World!\n")
@@ -38,15 +48,43 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 	// Create Request to tfServer
 	var tfServer string = "locahost:8500"
-}
 
-func responseError(w http.ResponseWriter, message string, code int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{"error": message})
-}
+	request := &pb.PredictRequest{
+		ModelSpec: &pb.ModelSpec{
+			Name:          "resnet",
+			SignatureName: "serving_default",
+		},
+		Inputs: map[string]*tf_core_framework.TensorProto{
+			"image_bytes": &tf_core_framework.TensorProto{
+				Dtype: tf_core_framework.DataType_DT_STRING,
+				TensorShape: &tf_core_framework.TensorShapeProto{
+					Dim: []*tf_core_framework.TensorShapeProto_Dim{
+						&tf_core_framework.TensorShapeProto_Dim{
+							Size: int64(1),
+						},
+					},
+				},
+				StringVal: [][]byte{imageBytes},
+			},
+		},
+	}
 
-func responseJson(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "appication/json")
-	json.NewEncoder(w).Encode(data)
+	// Connect to server
+	conn, err := grpc.Dial(*tfServer, grpc.WithInsecure())
+	if err != nil {
+		responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
+		return
+	}
+	defer conn.Close()
+
+	stub := pb.NewPredictionServiceClient(conn)
+
+	result, err := stub.Predict(context.Background(), request)
+	if err != nil {
+		responseError(w, "Could not run prediction", http.StatusInternalServerError)
+	}
+
+	responseJson(w, ClassifyResult {
+		FileName: header.FileName, Label: resp.Outputs["classes"].Int64Val
+	})
 }

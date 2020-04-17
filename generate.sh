@@ -11,3 +11,6 @@ git clone https://github.com/tensorflow/tensorflow.git
  eval "protoc $PROTOC_OPTS tensorflow/tensorflow/core/example/*.proto"
  eval "protoc $PROTOC_OPTS tensorflow/tensorflow/core/lib/core/*.proto"
  eval "protoc $PROTOC_OPTS tensorflow/tensorflow/core/protobuf/{saver,saved_model,meta_graph}.proto"
+
+ rm -rf serving
+ rm -rf tensorflow
