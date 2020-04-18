@@ -2,3 +2,9 @@
 		FileName: header.FileName,
 		Label:    result.Outputs["classes"].Int64Val,
 	})
+
+
+	type ClassifyResult struct {
+	FileName string `json: "Filename"`
+	Label    string `json:labels`
+}

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"google.golang.org/grpc"
@@ -19,34 +17,43 @@ import (
 	pb "tensorflow_serving/apis"
 )
 
-type ClassifyResult struct {
-	FileName string `json: "Filename"`
-	Label    string `json:labels`
-}
-
 func main() {
 	fmt.Printf("Hello, World!\n")
 
 	r := httprouter.New()
+
 	r.POST("/classify", classifyHandler)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// First Read image
-	imageFile, header, err := r.FormFile("image")
 
-	// Contains filename and extension
-	imageName := strings.Split(header.Filename, ".")
+	fileUrl := "https://upload.wikimedia.org/wikipedia/commons/4/4c/Push_van_cat.jpg"
+	resp, err := http.Get(fileUrl)
 	if err != nil {
-		responseError(w, "Could not read image", http.StatusBadRequest)
-		return
+		fmt.Println(err)
 	}
-	defer imageFile.Close()
+	defer resp.Body.Close()
 
-	var imageBuffer bytes.Buffer
-	// Copy image data to a buffer
-	io.Copy(&imageBuffer, imageFile)
+	imageBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// // First Read image
+	// imageFile, header, err := r.FormFile("image")
+
+	// // Contains filename and extension
+	// imageName := strings.Split(header.Filename, ".")
+	// if err != nil {
+	// 	responseError(w, "Could not read image", http.StatusBadRequest)
+	// 	return
+	// }
+	// defer imageFile.Close()
+
+	// var imageBuffer bytes.Buffer
+	// // Copy image data to a buffer
+	// io.Copy(&imageBuffer, imageFile)
 
 	// Create Request to tfServer
 	var tfServer string = "locahost:8500"
@@ -66,7 +73,7 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 						},
 					},
 				},
-				StringVal: [][]byte{imageBuffer},
+				StringVal: [][]byte{imageBytes},
 			},
 		},
 	}
