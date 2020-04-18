@@ -1,0 +1,4 @@
+	responseJson(w, ClassifyResult{
+		FileName: header.FileName,
+		Label:    result.Outputs["classes"].Int64Val,
+	})

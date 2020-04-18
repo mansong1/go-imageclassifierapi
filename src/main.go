@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -13,8 +12,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"google.golang.org/grpc"
 
+	tf_core_framework "tensorflow/core/framework/tensor_go_proto"
+	tf_core_framework_shape "tensorflow/core/framework/tensor_shape_go_proto"
+	tf_core_framework_types "tensorflow/core/framework/types_go_proto"
+
 	pb "tensorflow_serving/apis"
-	tf_core_framework "github.com/tensorflow/tensorflow/tensorflow/go/core/framework"
 )
 
 type ClassifyResult struct {
@@ -56,21 +58,21 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 		},
 		Inputs: map[string]*tf_core_framework.TensorProto{
 			"image_bytes": &tf_core_framework.TensorProto{
-				Dtype: tf_core_framework.DataType_DT_STRING,
-				TensorShape: &tf_core_framework.TensorShapeProto{
-					Dim: []*tf_core_framework.TensorShapeProto_Dim{
-						&tf_core_framework.TensorShapeProto_Dim{
+				Dtype: tf_core_framework_types.DataType_DT_STRING,
+				TensorShape: &tf_core_framework_shape.TensorShapeProto{
+					Dim: []*tf_core_framework_shape.TensorShapeProto_Dim{
+						&tf_core_framework_shape.TensorShapeProto_Dim{
 							Size: int64(1),
 						},
 					},
 				},
-				StringVal: [][]byte{imageBytes},
+				StringVal: [][]byte{imageBuffer},
 			},
 		},
 	}
 
 	// Connect to server
-	conn, err := grpc.Dial(*tfServer, grpc.WithInsecure())
+	conn, err := grpc.Dial(tfServer, grpc.WithInsecure())
 	if err != nil {
 		responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
 		return
@@ -84,7 +86,5 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 		responseError(w, "Could not run prediction", http.StatusInternalServerError)
 	}
 
-	responseJson(w, ClassifyResult {
-		FileName: header.FileName, Label: resp.Outputs["classes"].Int64Val
-	})
+	fmt.Printf("classes: %v", result.Outputs["classes"].Int64Val)
 }
