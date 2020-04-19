@@ -8,3 +8,5 @@
 	FileName string `json: "Filename"`
 	Label    string `json:labels`
 }
+Dockerfile:25 DL3020 Use COPY instead of ADD for files and folders
+Dockerfile:27 DL3018 Pin versions in apk add. Instead of `apk add <package>` use `apk add <package>=<version>`

@@ -22,6 +22,10 @@ type payload struct {
 	URL string `json:"URL"`
 }
 
+type ClassifyResult struct {
+	Label string `json:"label"`
+}
+
 var tfServer string = "tfserver:8500"
 
 func main() {
@@ -92,9 +96,19 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 
 	result, err := stub.Predict(context.Background(), request)
 	if err != nil {
-		fmt.Printf("Error calling prediction %s", err)
-		//responseError(w, "Could not run prediction", http.StatusInternalServerError)
+		responseError(w, "Could not run prediction", http.StatusInternalServerError)
 	}
 
-	fmt.Printf("classes: %v", result.Outputs["classes"].Int64Val)
+	result_class := result.Outputs["classes"].Int64Val[0]
+	predictidx := int(result_class) - 1 // return int
+
+	// get the classes
+	classes, err := getClassName()
+	if err != nil {
+		log.Fatal("Error getting categories", err)
+	}
+
+	fmt.Printf("classes: %v", predictidx)
+	fmt.Println("Probably ", classes[predictidx])
+	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
 }
