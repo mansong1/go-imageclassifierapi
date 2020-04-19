@@ -20,7 +20,7 @@ func responseJson(w http.ResponseWriter, data interface{}) {
 
 func getClassName() (map[int][]string, error) {
 	// open imagnet_class_index file
-	reader, err := os.Open("imagenet_class_index.json")
+	reader, err := os.Open("/app/conf/imagenet_class_index.json")
 	if err != nil {
 		return nil, err
 	}

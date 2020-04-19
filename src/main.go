@@ -88,7 +88,7 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Connecting to tfServer at %v", tfServer)
 	if err != nil {
 		log.Fatalf("Cannot connect to server %v", err)
-		//responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
+		responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
 	}
 	defer conn.Close()
 
@@ -105,10 +105,10 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	// get the classes
 	classes, err := getClassName()
 	if err != nil {
-		log.Fatal("Error getting categories", err)
+		log.Printf("Error: %s", err)
 	}
 
-	fmt.Printf("classes: %v", predictidx)
-	fmt.Println("Probably ", classes[predictidx])
+	log.Printf("\nclasses: %v", predictidx)
+	log.Printf("\nProbably ", classes[predictidx][1])
 	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
 }
