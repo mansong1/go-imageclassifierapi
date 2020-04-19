@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
 	tf_core_framework "tensorflow/core/framework/tensor_go_proto"
@@ -17,19 +18,37 @@ import (
 	pb "tensorflow_serving/apis"
 )
 
-func main() {
-	fmt.Printf("Hello, World!\n")
-
-	r := httprouter.New()
-
-	r.POST("/classify", classifyHandler)
-	log.Fatal(http.ListenAndServe(":8080", r))
+type payload struct {
+	URL string `json:"URL"`
 }
 
-func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+var tfServer string = "tfserver_1:8500"
 
-	fileUrl := "https://upload.wikimedia.org/wikipedia/commons/4/4c/Push_van_cat.jpg"
-	resp, err := http.Get(fileUrl)
+func main() {
+
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", homeLink)
+	router.HandleFunc("/classify", classifyHandler).Methods("POST")
+	log.Fatal(http.ListenAndServe(":8080", router))
+
+}
+
+func homeLink(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome home!")
+}
+
+func classifyHandler(w http.ResponseWriter, r *http.Request) {
+
+	var imgUrl payload
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Enter image URL")
+	}
+
+	json.Unmarshal(reqBody, &imgUrl)
+	w.WriteHeader(http.StatusCreated)
+
+	resp, err := http.Get(imgUrl.URL)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -39,24 +58,6 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	// // First Read image
-	// imageFile, header, err := r.FormFile("image")
-
-	// // Contains filename and extension
-	// imageName := strings.Split(header.Filename, ".")
-	// if err != nil {
-	// 	responseError(w, "Could not read image", http.StatusBadRequest)
-	// 	return
-	// }
-	// defer imageFile.Close()
-
-	// var imageBuffer bytes.Buffer
-	// // Copy image data to a buffer
-	// io.Copy(&imageBuffer, imageFile)
-
-	// Create Request to tfServer
-	var tfServer string = "locahost:8500"
 
 	request := &pb.PredictRequest{
 		ModelSpec: &pb.ModelSpec{
@@ -80,9 +81,10 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 	// Connect to server
 	conn, err := grpc.Dial(tfServer, grpc.WithInsecure())
+	log.Printf("Connecting to tfServer at %v", tfServer)
 	if err != nil {
-		responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
-		return
+		log.Fatalf("Cannot connect to server %v", err)
+		//responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
 	}
 	defer conn.Close()
 
@@ -90,7 +92,8 @@ func classifyHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 	result, err := stub.Predict(context.Background(), request)
 	if err != nil {
-		responseError(w, "Could not run prediction", http.StatusInternalServerError)
+		fmt.Printf("Error calling prediction %s", err)
+		//responseError(w, "Could not run prediction", http.StatusInternalServerError)
 	}
 
 	fmt.Printf("classes: %v", result.Outputs["classes"].Int64Val)
