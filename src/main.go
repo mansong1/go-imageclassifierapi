@@ -22,7 +22,7 @@ type payload struct {
 	URL string `json:"URL"`
 }
 
-var tfServer string = "tfserver_1:8500"
+var tfServer string = "tfserver:8500"
 
 func main() {
 
