@@ -35,15 +35,13 @@ class PostPrediction extends Component {
     api
     .post('/classify', URL)
     .then(res => {
-        console.log(res);
         console.log(res.data)
-        console.log(res.headers)
       }
     )
   }
 
   render() {
-    const { url } = this.state
+    const { url } = this.state;
     return (
       <div className="App">
         <form onSubmit={this.handleSubmit}>
