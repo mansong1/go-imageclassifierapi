@@ -11,7 +11,7 @@ pipeline {
                 sh 'tidy -q -e *.html'
             }
         }
-        stage('Lint Dockerfile'){
+        stage('Lint Dockerfile') {
             steps {
                 sh 'hadolint Dockerfile'
             }
@@ -32,7 +32,7 @@ pipeline {
                         }
         }
         stage ('Analysis') {
-            sh 'docker run -i kubesec/kubesec:c5a4ff5 scan /dev/stdin < deployment.yaml | jq --exit-status '.score > 10' >/dev/null'
+            sh 'docker run -i kubesec/kubesec:v2 scan /dev/stdin < k8s-deployment.yaml | jq --exit-status '.score > 10' >/dev/null'
         }
         stage('Deploy') {
             withCredentials([
@@ -60,5 +60,6 @@ pipeline {
        always {
            deleteDir()
        }
+    //TODO: Submit Slack to say successful deployment
     }
 }
