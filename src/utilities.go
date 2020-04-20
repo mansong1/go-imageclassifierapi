@@ -11,14 +11,20 @@ import (
 )
 
 func handleRequests() {
+
+	c := cors.New(cors.Options{
+		AllowedHeaders: []string{"X-Auth-Key", "X-Auth-Secret", "Content-Type", "Authorization"}
+	})
+
 	router := mux.NewRouter().StrictSlash(true)
+
 	router.HandleFunc("/", homePage)
 	router.HandleFunc("/classify", classifyHandler).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8080", router))
+
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS()(router)))
 }
 
 func responseError(w http.ResponseWriter, message string, code int) {
-	w.Header().Set("Accept", "application/json")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
