@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
 	tf_core_framework "tensorflow/core/framework/tensor_go_proto"
@@ -29,16 +28,12 @@ type ClassifyResult struct {
 var tfServer string = "tfserver:8500"
 
 func main() {
-
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", homeLink)
-	router.HandleFunc("/classify", classifyHandler).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8080", router))
-
+	handleRequests()
 }
 
-func homeLink(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome home!")
+func homePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to the HomePage!")
+	fmt.Println("Endpoint Hit: homePage")
 }
 
 func classifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,6 +104,6 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("\nclasses: %v", predictidx)
-	log.Printf("\nProbably ", classes[predictidx][1])
+	log.Printf("\nProbably %v", classes[predictidx][1])
 	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
 }

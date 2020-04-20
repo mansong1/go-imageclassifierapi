@@ -3,9 +3,19 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
 )
+
+func handleRequests() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", homePage)
+	router.HandleFunc("/classify", classifyHandler).Methods("POST")
+	log.Fatal(http.ListenAndServe(":8080", router))
+}
 
 func responseError(w http.ResponseWriter, message string, code int) {
 	w.Header().Set("Content-Type", "application/json")
