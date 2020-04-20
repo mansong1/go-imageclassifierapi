@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
 	tf_core_framework "tensorflow/core/framework/tensor_go_proto"
@@ -32,8 +34,20 @@ func main() {
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the HomePage!")
-	fmt.Println("Endpoint Hit: homePage")
+	w.Write([]byte("Welcome to the Homepage!"))
+}
+
+func handleRequests() {
+
+	router := mux.NewRouter().StrictSlash(true)
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	origins := handlers.AllowedOrigins([]string{"*"})
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+
+	router.HandleFunc("/", homePage).Methods("GET")
+	router.HandleFunc("/classify", classifyHandler).Methods("POST")
+
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(headers, methods, origins)(router)))
 }
 
 func classifyHandler(w http.ResponseWriter, r *http.Request) {

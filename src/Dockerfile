@@ -35,6 +35,7 @@ RUN apk update \
 WORKDIR $GOPATH/src/app
 # Fetch dependencies
 RUN go get github.com/gorilla/mux \
+github.com/gorilla/handlers \
 google.golang.org/grpc
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o api .
