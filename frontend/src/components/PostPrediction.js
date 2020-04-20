@@ -25,8 +25,6 @@ class PostPrediction extends Component {
 
   handleSubmit = event => {
     event.preventDefault(); //stop browser from reloading page
-    console.log('The link was clicked.');
-    console.log(this.state)
 
     const URL = {
       url: this.state.url
