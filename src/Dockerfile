@@ -47,7 +47,6 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/src/app/api /app/api
 COPY --from=builder /go/src/app/conf/ /app/conf/
-RUN ls /app/
 
 # Use an unprivileged user.
 USER api:api
