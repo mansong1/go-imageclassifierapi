@@ -76,7 +76,7 @@ class PostPrediction extends Component {
               valid={ this.state.validate.urlState === 'has-success' }
               invalid={ this.state.validate.urlState === 'has-danger' }
               onChange={this.handleChange}/>
-            <FormText className="text-muted">Image URL is of type jpeg.</FormText>
+            <FormText className="text-muted">Image URL should of type jpeg.</FormText>
             <FormFeedback valid>
               This looks like a valid URL
             </FormFeedback>
