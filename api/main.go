@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 
 	tf_core_framework "tensorflow/core/framework/tensor_go_proto"
@@ -19,6 +20,13 @@ import (
 	pb "tensorflow_serving/apis"
 )
 
+type Config struct {
+	Server struct {
+		Port string `envconfig:"SERVER_PORT"`
+		Host string `envconfig:"SERVER_HOST"`
+	}
+}
+
 type payload struct {
 	URL string `json:"URL"`
 }
@@ -27,9 +35,13 @@ type ClassifyResult struct {
 	Label string `json:"label"`
 }
 
-var tfServer string = "tfserver:8500"
-
 func main() {
+	var cfg Config
+	err := envconfig.Process("", &cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	var tfServer string = cfg.Server.Host + ':' + cfg.Server.Port
 	handleRequests()
 }
 
