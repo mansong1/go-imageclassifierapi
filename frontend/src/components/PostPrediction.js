@@ -134,6 +134,7 @@ class PostPrediction extends Component {
             (<Row>
               <Col className="result-container">
                 <h5 id="result">This looks like: {this.capitaliseString(prediction)}</h5>
+                <img className="img-responsive" alt="new" src={this.state.url} width="300" />
               </Col>
             </Row>)
           }
