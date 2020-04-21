@@ -1,0 +1,12 @@
+.gradle/
+build/
+node_modules/
+bin/
+obj/
+target/
+dist/
+*.egg-info/
+
+go.sum
+package-lock.json
+Cargo.lock
