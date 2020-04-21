@@ -107,7 +107,7 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Connect to server
 	conn, err := grpc.Dial(tfServer, grpc.WithInsecure())
-	log.Printf("Connecting to tfServer at %v", tfServer)
+
 	if err != nil {
 		log.Fatalf("Cannot connect to server %v", err)
 		responseError(w, "Cannot connect to tfSever", http.StatusInternalServerError)
@@ -130,7 +130,5 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error: %s", err)
 	}
 
-	log.Printf("\nclasses: %v", predictidx)
-	log.Printf("\nProbably %v", classes[predictidx][1])
 	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
 }
