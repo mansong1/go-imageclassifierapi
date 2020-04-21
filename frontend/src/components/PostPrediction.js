@@ -28,6 +28,11 @@ class PostPrediction extends Component {
       },
     }
     this.handleChange = this.handleChange.bind(this);
+    this.baseState = this.state; // preserver the initial state in a new object
+  }
+
+  resetForm = () => {
+    this.setState(this.baseState)
   }
 
   handleChange = event => {
@@ -60,13 +65,14 @@ class PostPrediction extends Component {
       })
       }
     )
+    this.image = this.state.url
+    this.setState({
+      url: ''
+    })
   }
 
   handleCancelClick = event => {
-    this.setState({ 
-      url: '',
-      prediction: '',
-  });
+    this.resetForm()
   }
 
   capitaliseString(str) {
@@ -134,7 +140,7 @@ class PostPrediction extends Component {
             (<Row>
               <Col className="result-container">
                 <h5 id="result">This looks like: {this.capitaliseString(prediction)}</h5>
-                <img className="img-responsive" alt="new" src={this.state.url} width="300" />
+                <img className="img-responsive" alt="new" src={this.image} width="300" />
               </Col>
             </Row>)
           }
