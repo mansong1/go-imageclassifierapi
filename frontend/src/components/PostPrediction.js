@@ -129,6 +129,7 @@ class PostPrediction extends Component {
               </Col>
             </Row>
           </Form>
+          
           {prediction === "" ? null :
             (<Row>
               <Col className="result-container">
