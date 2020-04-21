@@ -36,12 +36,6 @@ type ClassifyResult struct {
 }
 
 func main() {
-	var cfg Config
-	err := envconfig.Process("", &cfg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	var tfServer string = cfg.Server.Host + ':' + cfg.Server.Port
 	handleRequests()
 }
 
@@ -63,6 +57,13 @@ func handleRequests() {
 }
 
 func classifyHandler(w http.ResponseWriter, r *http.Request) {
+
+	var cfg Config
+	err := envconfig.Process("", &cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	var tfServer string = cfg.Server.Host + ":" + cfg.Server.Port
 
 	var imgUrl payload
 	reqBody, err := ioutil.ReadAll(r.Body)
