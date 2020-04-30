@@ -32,7 +32,7 @@ pipeline {
                         }
         }
         stage ('Analysis') {
-            sh 'docker run -i kubesec/kubesec:v2 scan /dev/stdin < k8s-deployment.yaml | jq --exit-status '.score > 10' >/dev/null'
+            sh 'docker run -i kubesec/kubesec:v2 scan /dev/stdin < k8s-tfserver.yaml | jq --exit-status '.score > 10' >/dev/null'
         }
         stage('Deploy') {
             withCredentials([

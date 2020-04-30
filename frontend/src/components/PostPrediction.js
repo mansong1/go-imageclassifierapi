@@ -1,14 +1,14 @@
-import React, { Component, StrictMode } from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
 
 
 import {
   Container, Col, Form, Row, Label,
-  FormGroup, Button, FormText, FormFeedback, Spinner, Input
+  FormGroup, Button, FormText, FormFeedback, Input
 } from 'reactstrap';
 
 const api = axios.create({
-  baseURL: `http://localhost:8080`,
+  baseURL: `http://192.168.64.5:30965`,
   headers: {
     'Content-Type': 'application/json',
   }

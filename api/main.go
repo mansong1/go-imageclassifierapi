@@ -53,7 +53,7 @@ func handleRequests() {
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/classify", classifyHandler).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(headers, methods, origins)(router)))
+	log.Fatal(http.ListenAndServe(":3000", handlers.CORS(headers, methods, origins)(router)))
 }
 
 func classifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	var imgUrl payload
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Enter image URL")
+		fmt.Fprintf(w, "Didn't receive image url")
 	}
 
 	json.Unmarshal(reqBody, &imgUrl)
@@ -130,5 +130,6 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error: %s", err)
 	}
 
+	log.Printf("Classified Image as %v", classes[predictidx][1])
 	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
 }

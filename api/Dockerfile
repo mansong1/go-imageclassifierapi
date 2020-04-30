@@ -36,14 +36,14 @@ WORKDIR $GOPATH/src/app
 # Fetch dependencies
 RUN go get github.com/gorilla/mux \
 github.com/gorilla/handlers \
-google.golang.org/grpcm \
+google.golang.org/grpc \
 github.com/kelseyhightower/envconfig
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o api .
 
 FROM scratch
-EXPOSE 8080
+EXPOSE 3000
 # Import from builder
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/passwd /etc/passwd
