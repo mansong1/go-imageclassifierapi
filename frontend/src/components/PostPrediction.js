@@ -9,7 +9,7 @@ import {
 } from 'reactstrap';
 
 const api = axios.create({
-  baseURL: `http://192.168.64.5:30965`,
+  baseURL: window.env.REACT_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   }
