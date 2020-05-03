@@ -13,7 +13,7 @@ func responseError(w http.ResponseWriter, message string, code int) {
 	json.NewEncoder(w).Encode(map[string]string{"error": message})
 }
 
-func responseJson(w http.ResponseWriter, data interface{}) {
+func responseJSON(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "appication/json")
 	json.NewEncoder(w).Encode(data)
 }

@@ -65,16 +65,16 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var tfServer string = cfg.Server.Host + ":" + cfg.Server.Port
 
-	var imgUrl payload
+	var imgURL payload
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Didn't receive image url")
 	}
 
-	json.Unmarshal(reqBody, &imgUrl)
+	json.Unmarshal(reqBody, &imgURL)
 	w.WriteHeader(http.StatusCreated)
 
-	resp, err := http.Get(imgUrl.URL)
+	resp, err := http.Get(imgURL.URL)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -121,8 +121,8 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 		responseError(w, "Could not run prediction", http.StatusInternalServerError)
 	}
 
-	result_class := result.Outputs["classes"].Int64Val[0]
-	predictidx := int(result_class) - 1 // return int
+	resultClass := result.Outputs["classes"].Int64Val[0]
+	predictidx := int(resultClass) - 1 // return int
 
 	// get the classes
 	classes, err := getClassName()
@@ -131,5 +131,5 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Classified Image as %v", classes[predictidx][1])
-	responseJson(w, ClassifyResult{Label: classes[predictidx][1]})
+	responseJSON(w, ClassifyResult{Label: classes[predictidx][1]})
 }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Config from 'Config';
 
 
 import {
@@ -9,7 +8,7 @@ import {
 } from 'reactstrap';
 
 const api = axios.create({
-  baseURL: window.env.REACT_APP_API_URL,
+  baseURL: window.REACT_APP_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   }

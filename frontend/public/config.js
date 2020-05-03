@@ -1,3 +1,1 @@
-window.ENV = {
-  "REACT_APP_API_URL"  : "http://api-service:3000",
-}
+window.REACT_APP_BACKEND_URL=http://192.168.64.5:32114;
