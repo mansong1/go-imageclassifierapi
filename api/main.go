@@ -68,7 +68,7 @@ func classifyHandler(w http.ResponseWriter, r *http.Request) {
 	var imgURL payload
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Didn't receive image url")
+		log.Printf("Didn't receive image url: %s,", err)
 	}
 
 	json.Unmarshal(reqBody, &imgURL)
